@@ -45,7 +45,9 @@ RSpec.describe QuestionsController, type: :controller do
   describe 'POST #create' do
     context 'with valid attr' do
       it 'saves a new quest in the database' do
-        expect { post :create, params: { question: attributes_for(:question) } }.to change(Question, :count).to be(1)
+        expect{
+          post :create, params: { question: attributes_for(:question) }
+        }.to change(Question, :count).to be(1)
       end
 
       it 'redirect to show view' do
@@ -56,7 +58,9 @@ RSpec.describe QuestionsController, type: :controller do
 
     context 'with invalid attr' do
       it 'does not save the question' do
-        expect { post :create, params: { question: attributes_for(:question, :invalid) } }.to_not change(Question, :count)
+        expect{
+          post :create, params: { question: attributes_for(:question, :invalid) }
+        }.to_not change(Question, :count)
       end
 
       it 'render new' do
@@ -115,5 +119,4 @@ RSpec.describe QuestionsController, type: :controller do
       expect(response).to redirect_to questions_path
     end
   end
-
 end

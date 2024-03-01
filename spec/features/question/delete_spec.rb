@@ -2,18 +2,29 @@ require 'rails_helper'
 
 feature 'User can delete only own question' do
   given(:user) { create(:user) }
+  given(:question) { create(:question, user: user) }
 
-  background { sign_in(user) }
-  given(:question) { user.questions.create(title: 'Question', body: 'My question') }
+  describe 'User author' do
+    background { sign_in(user) }
 
-  scenario 'delete question' do
-    visit question_path(question)
-    click_on 'Delete Question'
+    scenario 'Author user' do
+      visit question_path(question)
+      click_on 'Delete question'
 
-    expect(page).to have_content('Question was deleted.')
+      expect(page).to have_content 'Question was deleted.'
+    end
   end
 
-  scenario "can't delete other question" do
+  describe 'Other User tries delete' do
+    given(:other_user) { create(:user) }
 
+    background { sign_in(other_user) }
+
+    scenario 'other user' do
+      visit question_path(question)
+      click_button 'Delete question'
+
+      expect(page).to have_content 'You are not an author'
+    end
   end
 end

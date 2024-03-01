@@ -7,6 +7,7 @@ feature 'User can registration' do
     fill_in 'Email', with: 'first@mail.com'
     fill_in 'Password', with: 'ramazan'
     fill_in 'Password confirmation', with: 'ramazan'
+    click_on 'Sign up'
 
     expect(page).to have_content 'Welcome! You have signed up successfully.'
   end

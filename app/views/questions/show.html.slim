@@ -1,6 +1,8 @@
 p= question.title
 p= question.body
 
+p= button_to 'Delete question', question_path(question), method: :delete
+
 = form_with model: [@question, @answer], local: true do |f|
   = render 'shared/errors', resource: @answer
   = f.label :body

@@ -1,15 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe QuestionsController, type: :controller do
-  let(:question) { create(:question) }
   let(:user) { create(:user) }
+  let(:question) { create(:question, user: user) }
 
   describe 'GET #index' do
-    let(:questions) { create_list(:question, 3) }
+    let(:questions) { create_list(:question, 3, user: user) }
 
     before { get :index }
-
     it 'populates an array of all questions' do
+
       expect(assigns(:questions)).to match_array(questions)
     end
 
@@ -51,12 +51,12 @@ RSpec.describe QuestionsController, type: :controller do
     context 'with valid attr' do
       it 'saves a new quest in the database' do
         expect{
-          post :create, params: { question: attributes_for(:question) }
+          post :create, params: { question: attributes_for(:question), user_id: user.id }
         }.to change(Question, :count).to be(1)
       end
 
       it 'redirect to show view' do
-        post :create, params: { question: attributes_for(:question) }
+        post :create, params: { question: attributes_for(:question), user_id: user.id }
         expect(response).to redirect_to assigns(:question)
       end
     end
@@ -79,7 +79,10 @@ RSpec.describe QuestionsController, type: :controller do
     before { login(user) }
 
     context 'valid attr' do
-      before { patch :update, params: { id: question.id, question: attributes_for(:question) } }
+      before {
+        patch :update, params: { user_id: user.id, id: question.id,
+        question: attributes_for(:question) }
+      }
 
       it 'assigns the requested question to @question' do
         expect(assigns(:question)).to eq question
@@ -100,7 +103,9 @@ RSpec.describe QuestionsController, type: :controller do
 
     context 'invalid attr' do
       it 'does not change question' do
-        patch :update, params: { id: question, question: attributes_for(:question, :invalid) }
+        patch :update, params: {
+          user_id: user.id, id: question, question: attributes_for(:question, :invalid)
+        }
         question.reload
 
         expect(question.title).to eq('MyString')
@@ -116,19 +121,34 @@ RSpec.describe QuestionsController, type: :controller do
 
   describe 'DELETE #destroy' do
     before { login(user) }
-    let(:user) { create(:user) }
-    let!(:question) { user.questions.create(title: 'Quest', body: 'My question') }
+    let!(:question) { create(:question, user: user) }
 
+    context 'user own the question' do
+      it 'deletes the question' do
+        expect {
+          delete :destroy, params: { id: question }
+        }.to change{ user.questions.count }.by(-1)
+      end
 
-    it 'deletes the question' do
-      if user.questions.include?(question)
-        expect { delete :destroy, params: { id: question } }.to change(user.questions, :count).by(-1)
+      it 'redirect ' do
+        delete :destroy, params: { id: question }
+        expect(response).to redirect_to questions_path
       end
     end
 
-    it 'redirect ' do
-      delete :destroy, params: { id: question }
-      expect(response).to redirect_to questions_path
+    context 'another user tries to delete question' do
+      let(:another_user) { create(:user) }
+      before { login(another_user) }
+      subject { delete :destroy, params: { id: question.id} }
+
+      it 'should not delete' do
+        expect { subject }.to_not change{ user.questions.count}
+      end
+
+      it 'should redirect to question page' do
+        subject
+        expect(response).to redirect_to(question_path(question))
+      end
     end
   end
 end

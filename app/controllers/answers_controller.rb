@@ -1,11 +1,13 @@
 class AnswersController < ApplicationController
+  before_action :authenticate_user!
   def create
     @question = Question.find(params[:question_id])
     @answer =  @question.answers.build(answer_params)
+
     if @answer.save
-      redirect_to question_path(@answer.question)
+      redirect_to question_path(@answer.question), notice: 'Answer successfully created'
     else
-      render :new
+      render 'questions/show'
     end
   end
 

@@ -8,6 +8,10 @@ p= @question.body
       = button_to 'remove', file_path(file),
                             method: :delete
 
+p Links:
+- @question.links.each do |link|
+  p= link_to link.name, link.url
+
 
 
 p= button_to 'Delete question', question_path(@question), method: :delete

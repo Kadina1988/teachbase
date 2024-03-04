@@ -33,6 +33,14 @@ RSpec.describe QuestionsController, type: :controller do
     it 'render new view' do
       expect(response).to render_template :new
     end
+
+    it 'should be Question new @question' do
+      expect(assigns(:question)).to be_a_new(Question)
+    end
+
+    it 'should be new question.link' do
+      expect(assigns(:question).links.first).to be_a_new(Link)
+    end
   end
 
   describe 'GET #edit' do

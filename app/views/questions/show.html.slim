@@ -16,7 +16,10 @@ p Links:
 
 p= button_to 'Delete question', question_path(@question), method: :delete
 
-- @question.answers.each do |answer|
-  p= answer.body
+.answers
+  - @question.answers.each do |answer|
+    p= answer.body
+    - answer.links.each do |link|
+      p= link_to link.name, link.url
 
 = render 'answers/form'

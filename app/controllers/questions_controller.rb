@@ -7,6 +7,7 @@ class QuestionsController < ApplicationController
   def show
     @question = Question.with_attached_files.find(params[:id])
     @answer = question.answers.build
+    @link = @answer.links.new
   end
 
   def new

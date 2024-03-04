@@ -16,8 +16,4 @@ feature 'User can to show question and answers', %q{
   end
 
   scenario 'Unauthirized User vatching questions and his answers' do;end
-
-  scenario 'Authorized user vatching question page' do
-    sign_in(user)
-  end
 end
